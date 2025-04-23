@@ -31,12 +31,12 @@ const images = [
 ];
 
 const songs = [
-  { title: "Nuestra Canción", artist: "Tu y Yo", src: song1, cover: cover1 },
-  { title: "Mi Kind of Woman", artist: "Danoff Dylan", src: song2, cover: cover2 },
-  { title: "Cold Man", artist: "La Banda Fría", src: song3, cover: cover3 },
-  { title: "Smithereens", artist: "The Romantic", src: song4, cover: cover4 },
-  { title: "Queen", artist: "Reina del Amor", src: song5, cover: cover5 },
-  { title: "Tattoo", artist: "Marcas Eternas", src: song6, cover: cover6 },
+  { title: "I Will", artist: "Mitski", src: song1, cover: cover1 },
+  { title: "Mi Kind of Woman", artist: "Mark DeMarco", src: song2, cover: cover2 },
+  { title: "Cold Cold Man", artist: "Saint Motel", src: song3, cover: cover3 },
+  { title: "Smithereens", artist: "Twenty One Pilots", src: song4, cover: cover4 },
+  { title: "Love of My Life", artist: "Queen", src: song5, cover: cover5 },
+  { title: "Tattoo", artist: "Rammstein", src: song6, cover: cover6 },
 ];
 
 function App() {
@@ -152,14 +152,33 @@ function App() {
 
   const receiveLetter = () => {
     if (!availableLetters.length) return;
+  
     const idx = Math.floor(Math.random() * availableLetters.length);
     const file = availableLetters[idx];
+  
+    // Actualizamos el estado de availableLetters
     setAvailableLetters(a => a.filter((_, i) => i !== idx));
-    fetch(`/cartas/${file}`).then(r => r.text()).then(t => {
-      setCurrentLetter(t || "");
-      setSkipTyping(false);
-      setShowLetter(true);
-    });
+  
+    // Realizamos la solicitud fetch con manejo de errores
+    fetch(`/amordemivida/cartas/${file}`)
+      .then(response => {
+        // Verificamos si la respuesta es exitosa (status 200-299)
+        if (!response.ok) {
+          throw new Error('Error al cargar la carta');
+        }
+        return response.text();
+      })
+      .then(t => {
+        // Actualizamos el estado con el texto de la carta
+        setCurrentLetter(t || "");
+        setSkipTyping(false);
+        setShowLetter(true);
+      })
+      .catch(error => {
+        // Manejo de errores si la solicitud falla
+        console.error('Hubo un problema con la solicitud:', error);
+        // Opcional: podrías establecer algún estado para mostrar un mensaje de error al usuario
+      });
   };
 
   const closeLetter = () => {
